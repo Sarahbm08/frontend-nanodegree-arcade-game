@@ -33,40 +33,65 @@ Enemy.prototype.render = function() {
 // This class requires an update(), render() and
 // a handleInput() method.
 function Player() {
-	this.sprite = 'images/char-cat-girl.png'; //TODO: make this change based on user preference
-	this.x = 0;
-	this.y = 0;
-}
+	this.sprite = 'images/char-boy.png'; //TODO: make this change based on user preference
+	this.x = 200;
+	this.y = 380;
+};
 
 // Update the player's position
 // Parameter: dt, a time delta between ticks
 Player.prototype.update = function(dt) {
 	
-}
+};
 
 // Draw the player on the screen
 // THOUGHT TO ADD LATER? : make a basic "render" function to render both players and enemies
-Player.prototype.render = function() (
+Player.prototype.render = function() {
 	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 
 // Move player according to input (allowedKeys)
 // Parameter: allowedKeys, the key which the user pressed
 Player.prototype.handleInput = function(allowedKeys) {
-	// TODO: keys to handle: up, down, left, right
-	// limitations: cannot move off screen, reach water and the games resets by moving the player to the initial location
-}
+	let tempX = this.x;
+	let tempY = this.y;
+	switch(allowedKeys)
+	{
+		case 'up': tempY -= 80;
+			break;
+		case 'down': tempY += 80;
+			break;
+		case 'right': tempX += 101;
+			break;
+		case 'left': tempX -= 101;
+	}
+	console.log("tempX: " + tempX + " tempY: " + tempY);
+	this.checkLocation(tempX, tempY);
+};
+
+// Checks if the given x and y are valid (on the screen or the water)
+// If the location touches the water, the player is reset to the starting position
+// Parameters: tempX and tempY, the potential location of the player
+Player.prototype.checkLocation = function(tempX, tempY) {
+	if(tempY < 0) // touching the water
+		this.resetLoc();
+	if(tempX < 500 && tempX > -3 && tempY < 400 && tempY > 0) //on the screen
+	{
+		this.x = tempX;
+		this.y = tempY;
+	}	
+};
 
 // Resets the player to it's initial location
 Player.prototype.resetLoc = function() {
-	this.x = 0;
-	this.y = 0;
-}
+	this.x = 200;
+	this.y = 380;
+};
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-let allEnemies = {};
+let allEnemies = [];
 for(let i = 0; i < NUM_ENEMIES; i++)
 	allEnemies.push(new Enemy());
 let player = new Player();
