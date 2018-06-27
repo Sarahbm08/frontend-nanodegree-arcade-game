@@ -2,16 +2,16 @@ const NUM_ENEMIES = 5;
 
 // Enemies our player must avoid
 // Enemy Constructor
-function Enemy() {
+function Enemy(x, y, speed) {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-	this.x = 0;
-	this.y = 0;
-	this.speed = 0;
+	this.x = x;
+	this.y = y;
+	this.speed = speed;
 };
 
 // Update the enemy's position, required method for game
@@ -20,6 +20,9 @@ Enemy.prototype.update = function(dt) {
     // You should multiply any movement by the dt parameter
     // which will ensure the game runs at the same speed for
     // all computers.
+	this.x += this.speed * dt;
+	if(this.x > 500) //TODO: randomize position off screen, and randomize a new speed
+		this.x = -100; //reset
 };
 
 // TODO: handle collision with the Player
@@ -45,7 +48,6 @@ Player.prototype.update = function(dt) {
 };
 
 // Draw the player on the screen
-// THOUGHT TO ADD LATER? : make a basic "render" function to render both players and enemies
 Player.prototype.render = function() {
 	ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
@@ -55,11 +57,10 @@ Player.prototype.render = function() {
 Player.prototype.handleInput = function(allowedKeys) {
 	let tempX = this.x;
 	let tempY = this.y;
-	switch(allowedKeys)
-	{
-		case 'up': tempY -= 80;
+	switch(allowedKeys) {
+		case 'up': tempY -= 83;
 			break;
-		case 'down': tempY += 80;
+		case 'down': tempY += 83;
 			break;
 		case 'right': tempX += 101;
 			break;
@@ -75,8 +76,7 @@ Player.prototype.handleInput = function(allowedKeys) {
 Player.prototype.checkLocation = function(tempX, tempY) {
 	if(tempY < 0) // touching the water
 		this.resetLoc();
-	if(tempX < 500 && tempX > -3 && tempY < 400 && tempY > 0) //on the screen
-	{
+	if(tempX < 500 && tempX > -3 && tempY < 400 && tempY > 0) { //on the screen
 		this.x = tempX;
 		this.y = tempY;
 	}	
@@ -91,9 +91,10 @@ Player.prototype.resetLoc = function() {
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-let allEnemies = [];
-for(let i = 0; i < NUM_ENEMIES; i++)
-	allEnemies.push(new Enemy());
+let allEnemies = [new Enemy(-150, 60, 110), new Enemy(-150, 143, 80), new Enemy(-150, 226, 55),
+				  new Enemy(-150, 60, 330), new Enemy(-150, 143, 250), new Enemy(-150, 226, 190)];
+/*for(let i = 0; i < NUM_ENEMIES; i++)
+	allEnemies.push(new Enemy());*/
 let player = new Player();
 
 
