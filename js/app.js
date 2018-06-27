@@ -23,14 +23,22 @@ Enemy.prototype.update = function(dt) {
 	this.x += this.speed * dt;
 	if(this.x > 500) //TODO: randomize position off screen, and randomize a new speed
 		this.x = -100; //reset
+	
+	// Returns true if the given coordinates "collide"
+	if(allEnemies.some(function collide(enemy) {
+		let xDiff = Math.abs(enemy.x - player.x);
+		let yDiff = Math.abs(enemy.y - player.y);
+		return (xDiff < 40 && yDiff < 30) // COLLISION
+	})) {
+		player.resetLoc();
+	}
 };
-
-// TODO: handle collision with the Player
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
+
 
 // Now write your own player class
 // This class requires an update(), render() and
@@ -79,7 +87,7 @@ Player.prototype.checkLocation = function(tempX, tempY) {
 	if(tempX < 500 && tempX > -3 && tempY < 400 && tempY > 0) { //on the screen
 		this.x = tempX;
 		this.y = tempY;
-	}	
+	}
 };
 
 // Resets the player to it's initial location
