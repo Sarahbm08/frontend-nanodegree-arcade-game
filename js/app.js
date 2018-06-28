@@ -1,17 +1,18 @@
 const NUM_ENEMIES = 5;
+let winLabel = document.querySelector('#wins-label');
+let collisionsLabel = document.querySelector('#collisions-label');
 
 // Enemies our player must avoid
 // Enemy Constructor
-function Enemy(x, y, speed) {
+function Enemy() {
     // Variables applied to each of our instances go here,
     // we've provided one for you to get started
 
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-	this.x = x;
-	this.y = y;
-	this.speed = speed;
+	// Each time we create a new Enemy, it has a random location and speed
+	this.newRandomValues();
 };
 
 // Update the enemy's position, required method for game
@@ -21,16 +22,16 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
 	this.x += this.speed * dt;
-	if(this.x > 500) //TODO: randomize position off screen, and randomize a new speed
-		this.x = -100; //reset
+	if(this.x > 500)
+		this.newRandomValues();
 	
 	// Returns true if the given coordinates "collide"
-	if(allEnemies.some(function collide(enemy) {
+	if(allEnemies.some(function (enemy) {
 		let xDiff = Math.abs(enemy.x - player.x);
 		let yDiff = Math.abs(enemy.y - player.y);
-		return (xDiff < 40 && yDiff < 30) // COLLISION
+		return (xDiff < 70 && yDiff < 70); // COLLISION
 	})) {
-		player.resetLoc();
+		player.collide();
 	}
 };
 
@@ -38,6 +39,13 @@ Enemy.prototype.update = function(dt) {
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 };
+
+// Generates new random values for x, y, and speed
+Enemy.prototype.newRandomValues = function() {
+	this.x = getRandomInt(300) - 400; // -400 to -100
+	this.y = (getRandomInt(3) * 83) + 60; // 60, 143, or 226
+	this.speed = getRandomInt(500) + 70 // 70 to 570	
+}
 
 
 // Now write your own player class
@@ -47,6 +55,8 @@ function Player() {
 	this.sprite = 'images/char-boy.png'; //TODO: make this change based on user preference
 	this.x = 200;
 	this.y = 380;
+	this.wins = 0;
+	this.collisions = 0;
 };
 
 // Update the player's position
@@ -74,7 +84,6 @@ Player.prototype.handleInput = function(allowedKeys) {
 			break;
 		case 'left': tempX -= 101;
 	}
-	console.log("tempX: " + tempX + " tempY: " + tempY);
 	this.checkLocation(tempX, tempY);
 };
 
@@ -82,8 +91,8 @@ Player.prototype.handleInput = function(allowedKeys) {
 // If the location touches the water, the player is reset to the starting position
 // Parameters: tempX and tempY, the potential location of the player
 Player.prototype.checkLocation = function(tempX, tempY) {
-	if(tempY < 0) // touching the water
-		this.resetLoc();
+	if(tempY < 0) // touching the water--WIN!
+		this.win();
 	if(tempX < 500 && tempX > -3 && tempY < 400 && tempY > 0) { //on the screen
 		this.x = tempX;
 		this.y = tempY;
@@ -96,15 +105,40 @@ Player.prototype.resetLoc = function() {
 	this.y = 380;
 };
 
+// The Player has won! (touched the water) Reset their location, display win text,
+// and (eventually) increment win counter
+Player.prototype.win = function() {
+	this.resetLoc();
+	this.wins++;
+	winLabel.innerHTML = 'Wins: ' + this.wins;
+};
+
+// Resets the player's location and increments the number of collisions
+Player.prototype.collide = function() {
+	this.resetLoc();
+	this.collisions++;
+	collisionsLabel.innerHTML = 'Collisions: ' + this.collisions;
+};
+
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-let allEnemies = [new Enemy(-150, 60, 110), new Enemy(-150, 143, 80), new Enemy(-150, 226, 55),
-				  new Enemy(-150, 60, 330), new Enemy(-150, 143, 250), new Enemy(-150, 226, 190)];
-/*for(let i = 0; i < NUM_ENEMIES; i++)
-	allEnemies.push(new Enemy());*/
+let allEnemies = [];
+createEnemies(allEnemies);
 let player = new Player();
 
+function createEnemies(allEnemies) {
+	for(let i = 0; i < NUM_ENEMIES; i++) {
+		allEnemies.push(new Enemy());
+	}
+}
+
+// Copied from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
+// returns a random int from 0 to max-1
+// Parameter: max, number denoting the range of generation
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.
