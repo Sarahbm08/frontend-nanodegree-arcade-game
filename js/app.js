@@ -5,9 +5,6 @@ let collisionsLabel = document.querySelector('#collisions-label');
 // Enemies our player must avoid
 // Enemy Constructor
 function Enemy() {
-    // Variables applied to each of our instances go here,
-    // we've provided one for you to get started
-
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
@@ -42,9 +39,9 @@ Enemy.prototype.render = function() {
 
 // Generates new random values for x, y, and speed
 Enemy.prototype.newRandomValues = function() {
-	this.x = getRandomInt(300) - 400; // -400 to -100
+	this.x = getRandomInt(300) - 400; // -400 to -101
 	this.y = (getRandomInt(3) * 83) + 60; // 60, 143, or 226
-	this.speed = getRandomInt(500) + 70 // 70 to 570	
+	this.speed = getRandomInt(500) + 70 // 70 to 569
 }
 
 
@@ -53,14 +50,16 @@ Enemy.prototype.newRandomValues = function() {
 // a handleInput() method.
 function Player() {
 	this.sprite = 'images/char-boy.png'; //TODO: make this change based on user preference
-	this.x = 200;
-	this.y = 380;
+	this.resetLoc(); //sets x and y to initial position
 	this.wins = 0;
 	this.collisions = 0;
 };
 
 // Update the player's position
 // Parameter: dt, a time delta between ticks
+// ...I obviously never used this but it seems to be working fine.
+// Did I basically implement what you had in mind here somewhere else
+// or am I missing something?
 Player.prototype.update = function(dt) {
 	
 };
@@ -124,10 +123,11 @@ Player.prototype.collide = function() {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 let allEnemies = [];
-createEnemies(allEnemies);
+createEnemies();
 let player = new Player();
 
-function createEnemies(allEnemies) {
+// Adds NUM_ENEMIES Enemies to allEnemies array
+function createEnemies() {
 	for(let i = 0; i < NUM_ENEMIES; i++) {
 		allEnemies.push(new Enemy());
 	}
@@ -135,7 +135,7 @@ function createEnemies(allEnemies) {
 
 // Copied from https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Math/random
 // returns a random int from 0 to max-1
-// Parameter: max, number denoting the range of generation
+// Parameter: max, number denoting the range
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
